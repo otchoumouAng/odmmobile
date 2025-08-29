@@ -51,26 +51,36 @@ export const paletteApi = {
     }
   },
 
+  getProduction: async (id: string): Promise<Production> => {
+    try {
+      const response = await axios.get(`${baseUrl}/production/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la production:', error);
+      throw error;
+    }
+  },
 
-  createMouvementStock: async (palette: Palette): Promise<MouvementStock> => {
+
+  createMouvementStock: async (palette: Palette, production: Production): Promise<MouvementStock> => {
     try {
       // Map the Palette object to a new MouvementStock object for creation
       const newMouvement = {
         codeMagasin: palette.codeMagasin,
         date: new Date().toISOString(),
-        codePalette: palette.id, // Use the palette's ID for the CodePalette field
+        codePalette: palette.id, 
         processID: null,
-        codeTypeMouvement: 1, // Business rule: '1' could mean 'Entry from Declaration'
-        sens: 1, // '1' for stock entry (inflow)
-        codeConditionnement: palette.codeConditionnement,
-        codeReferenceConditionnement: palette.codeReferenceConditionnement,
-        nbreUniteParPalette: palette.nbreUniteParPalette,
-        uniteDePoids: palette.uniteDePoids,
-        poidsBrutUnitaire: palette.poidsBrutUnitaire,
-        tareUnitaireEmballage: palette.tareUnitaireEmballage,
-        poidsBrutPalette: palette.poidsBrutPalette,
-        tareEmballagePalette: palette.tareEmballagePalette,
-        poidsNetPalette: palette.poidsNetPalette,
+        codeTypeMouvement: 1, 
+        sens: 1, 
+        codeConditionnement: production.codeConditionnement,
+        codeReferenceConditionnement: production.codeReferenceConditionnement,
+        nbreUniteParPalette: production.nbreUniteParPalette,
+        uniteDePoids: "kg",
+        poidsBrutUnitaire: production.poidsBrutUnitaire,
+        tareUnitaireEmballage: production.tareUnitaireEmballage,
+        poidsBrutPalette: production.poidsBrutPalette,
+        tareEmballagePalette: production.tareEmballagePalette,
+        poidsNetPalette: production.poidsNetPalette,
         statut: 'DC', 
         creationUtilisateur: 'admin',
       };

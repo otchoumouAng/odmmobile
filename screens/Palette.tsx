@@ -53,6 +53,7 @@ export default function PaletteScreen() {
   }, []);
 
   
+
   const handleDeclarePalette = useCallback(async (paletteId: string) => {
     try {
       await paletteApi.updatePaletteByCode(paletteId);
@@ -64,8 +65,8 @@ export default function PaletteScreen() {
 
       // Create mouvement operation
 
-      const paletteData = await paletteApi.getProduction(handleDeclarePalette.productionID);
-      await paletteApi.createMouvementStock(paletteData);
+      const productionData = await paletteApi.getProduction(handleDeclarePalette.productionID);
+      await paletteApi.createMouvementStock(handleDeclarePalette,productionData);
 
       loadPalettes();
       return true; // Retourne true en cas de succès
