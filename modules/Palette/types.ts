@@ -7,6 +7,7 @@ export interface Palette {
   typeProduit: string;
   nomArticle: string;
   codeArticle: string;
+  codeMagasin: number;
   statut: string;
   dateDeclaration: datetime;
   rowVersionKey?: number[];
@@ -67,7 +68,7 @@ export interface Production {
     poidsBrutPalette: number | null;
     tareEmballagePalette: number | null;
     poidsNetPalette: number | null;
-    bestBeforeDate: number | null;
+    bestBeforeDate: string | null;
     annee: number;
     semaine: number;
     ligneProductionCode: number;

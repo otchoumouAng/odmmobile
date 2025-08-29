@@ -62,14 +62,8 @@ export default function PaletteScreen() {
         text1: 'Succès',
         text2: 'Palette déclarée avec succès',
       });
-
-      // Create mouvement operation
-
-      const productionData = await paletteApi.getProduction(handleDeclarePalette.productionID);
-      await paletteApi.createMouvementStock(handleDeclarePalette,productionData);
-
       loadPalettes();
-      return true; // Retourne true en cas de succès
+      return true;
     } catch (error) {
       console.error('Erreur lors de la déclaration:', error);
       Toast.show({
@@ -77,7 +71,7 @@ export default function PaletteScreen() {
         text1: 'Erreur',
         text2: 'Échec de la déclaration de la palette',
       });
-      throw error; // Propage l'erreur
+      throw error;
     }
   }, [loadPalettes]);
 
