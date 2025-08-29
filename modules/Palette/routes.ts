@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { baseUrl } from '../../config';
-import { Palette } from './types';
+import { Palette, Production, MouvementStock } from './types';
 
-export const paletteApi = {
-  getPalettes: async (): Promise<Palette[]> => {
+const getPalettes = async (): Promise<Palette[]> => {
     try {
       const response = await axios.get(`${baseUrl}/palette`);
       return response.data;
@@ -11,9 +10,9 @@ export const paletteApi = {
       console.error('Erreur lors de la récupération des palettes:', error);
       throw error;
     }
-  },
+};
 
-  getPalette: async (id: string): Promise<Palette> => {
+const getPalette = async (id: string): Promise<Palette> => {
     try {
       const response = await axios.get(`${baseUrl}/palette/${id}`);
       return response.data;
@@ -21,57 +20,38 @@ export const paletteApi = {
       console.error('Erreur lors de la récupération de la palette:', error);
       throw error;
     }
-  },
+};
 
-  updatePaletteByCode: async (id: string): Promise<Palette> => {
+const getProduction = async (id: string): Promise<Production> => {
     try {
-      // D'abord, récupérer les données actuelles de la palette
-      const currentPalette = await axios.get(`${baseUrl}/palette/${id}`);
-      
-      // Préparer les données pour la mise à jour
-      const updatedData = {
-        ...currentPalette.data,
-        statut: 'DC',
-        dateDeclaration: new Date().toISOString(),
-        modificationDate: new Date().toISOString(),
-        modificationUtilisateur: 'admin' 
-      };
-
-      // Envoyer la requête PUT avec les données dans le corps
-      const response = await axios.put(`${baseUrl}/palette/${id}`, updatedData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
+      const response = await axios.get(`${baseUrl}/production/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de la palette:', error);
+      console.error('Erreur lors de la récupération de la production:', error);
       throw error;
     }
-  },
+};
 
-
-  createMouvementStock: async (palette: Palette): Promise<MouvementStock> => {
+const createMouvementStock = async (palette: Palette, production: Production): Promise<MouvementStock> => {
     try {
       // Map the Palette object to a new MouvementStock object for creation
       const newMouvement = {
         codeMagasin: palette.codeMagasin,
         date: new Date().toISOString(),
-        codePalette: palette.id, // Use the palette's ID for the CodePalette field
-        processID: null,
-        codeTypeMouvement: 1, // Business rule: '1' could mean 'Entry from Declaration'
-        sens: 1, // '1' for stock entry (inflow)
-        codeConditionnement: palette.codeConditionnement,
-        codeReferenceConditionnement: palette.codeReferenceConditionnement,
-        nbreUniteParPalette: palette.nbreUniteParPalette,
-        uniteDePoids: palette.uniteDePoids,
-        poidsBrutUnitaire: palette.poidsBrutUnitaire,
-        tareUnitaireEmballage: palette.tareUnitaireEmballage,
-        poidsBrutPalette: palette.poidsBrutPalette,
-        tareEmballagePalette: palette.tareEmballagePalette,
-        poidsNetPalette: palette.poidsNetPalette,
-        statut: 'DC', 
+        codePalette: palette.id,
+        processID: production.id,
+        codeTypeMouvement: 1,
+        sens: 1,
+        codeConditionnement: production.conditionnementCode || 0,
+        codeReferenceConditionnement: String(production.conditionnementRefCode),
+        nbreUniteParPalette: production.nbreUniteParPalette || 0,
+        uniteDePoids: String(production.uniteDePoids),
+        poidsBrutUnitaire: production.poidsBrutUnitaire || 0,
+        tareUnitaireEmballage: production.tareUnitaireEmballage || 0,
+        poidsBrutPalette: production.poidsBrutPalette || 0,
+        tareEmballagePalette: production.tareEmballagePalette || 0,
+        poidsNetPalette: production.poidsNetPalette || 0,
+        statut: 'DC',
         creationUtilisateur: 'admin',
       };
 
@@ -87,8 +67,48 @@ export const paletteApi = {
       console.error('Erreur lors de la création du mouvement de stock:', error);
       throw error;
     }
-  },
+};
 
+const updatePaletteByCode = async (id: string): Promise<Palette> => {
+    try {
+      // First, get the current palette data
+      const { data: currentPalette } = await axios.get<Palette>(`${baseUrl}/palette/${id}`);
 
+      // Prepare the data for the update
+      const updatedData = {
+        ...currentPalette,
+        statut: 'DC',
+        dateDeclaration: new Date().toISOString(),
+        modificationDate: new Date().toISOString(),
+        modificationUtilisateur: 'admin'
+      };
 
+      // Send the PUT request with the data in the body
+      const { data: updatedPalette } = await axios.put<Palette>(`${baseUrl}/palette/${id}`, updatedData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Create stock movement
+      if (updatedPalette && updatedPalette.productionID) {
+        const production = await getProduction(updatedPalette.productionID);
+        if (production) {
+          await createMouvementStock(updatedPalette, production);
+        }
+      }
+
+      return updatedPalette;
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la palette:', error);
+      throw error;
+    }
+};
+
+export const paletteApi = {
+  getPalettes,
+  getPalette,
+  updatePaletteByCode,
+  getProduction,
+  createMouvementStock,
 };

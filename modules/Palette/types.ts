@@ -7,6 +7,7 @@ export interface Palette {
   typeProduit: string;
   nomArticle: string;
   codeArticle: string;
+  codeMagasin: number;
   statut: string;
   dateDeclaration: datetime;
   rowVersionKey?: number[];
@@ -16,29 +17,8 @@ export interface Palette {
 }
 
 
-const testMouvementStock: MouvementStock = {  
-  codeMagasin: 101,
-  date: new Date("2025-08-28T14:00:00Z"),
-  codePalette: "3fcb2e3f-78e9-45d4-a8dc-4e951fa3b6d7",
-  processID: null,
-  codeTypeMouvement: 1, 
-  sens: 1,              
-  codeConditionnement: 12,
-  codeReferenceConditionnement: "REF-ABC-2025",
-  nbreUniteParPalette: 50,
-  uniteDePoids: "kg",
-  poidsBrutUnitaire: 60.5,
-  tareUnitaireEmballage: 1.2,
-  poidsBrutPalette: 3025,
-  tareEmballagePalette: 60,
-  poidsNetPalette: 2965,
-  statut: "VL",
-  rowVersionKey: [0, 0, 0, 0, 0, 0, 3, 245], 
-  creationUtilisateur: "jdoe",
-};
 
-
-/*export interface MouvementStock {
+export interface MouvementStock {
   id?: string;
 
   codeMagasin: number;
@@ -66,7 +46,43 @@ const testMouvementStock: MouvementStock = {
   creationDate?: Date;
   modificationUtilisateur?: string;
   modificationDate?: Date;
-}*/
+}
+
+
+
+export interface Production {
+    id: string;
+    articleCode: string;
+    articleDesignation: string;
+    conditionnementCode: number | null;
+    conditionnementDesignation: string;
+    produitCode: number | null;
+    produitDesignation: string;
+    typeProduitCode: number | null;
+    typeProduitDesignation: string;
+    conditionnementRefCode: number | null;
+    nbreUniteParPalette: number | null;
+    uniteDePoids: string;
+    poidsBrutUnitaire: number | null;
+    tareUnitaireEmballage: number | null;
+    poidsBrutPalette: number | null;
+    tareEmballagePalette: number | null;
+    poidsNetPalette: number | null;
+    bestBeforeDate: string | null;
+    annee: number;
+    semaine: number;
+    ligneProductionCode: number;
+    ligneProductionDesignation: string;
+    numeroProduction: string;
+    referenceExterne: string;
+    recolteCode: number;
+    recolteDesignation: string;
+    clientCode: number;
+    clientNom: string;
+    nombrePaletteAProduire: number;
+}
+
+
 
 
 export interface ScanResult {
