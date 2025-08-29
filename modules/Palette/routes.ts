@@ -83,8 +83,8 @@ const updatePaletteByCode = async (id: string): Promise<Palette> => {
         modificationUtilisateur: 'admin'
       };
 
-      // Send the PUT request with the data in the body
-      const { data: updatedPalette } = await axios.put<Palette>(`${baseUrl}/palette/${id}`, updatedData, {
+      // Send the PATCH request with the data in the body
+      const { data: updatedPalette } = await axios.patch<Palette>(`${baseUrl}/palette/${id}`, updatedData, {
         headers: {
           'Content-Type': 'application/json'
         }
